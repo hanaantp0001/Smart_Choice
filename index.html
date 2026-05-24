@@ -20,7 +20,7 @@
         .product-card h3 { margin: 10px 0 5px 0; font-size: 18px; }
         .old-price { text-decoration: line-through; color: #888; font-size: 14px; margin-right: 8px; }
         .offer-price { color: #d32f2f; font-weight: bold; font-size: 16px; }
-        .btn { display: block; margin-top: 10px; background: #764ba2; color: white; padding: 8px; border-radius: 5px; text-decoration: none; font-weight: bold; }
+        .btn { display: block; margin-top: 10px; background: #764ba2; color: white; padding: 8px; border-radius: 5px; text-decoration: none; font-weight: bold; cursor: pointer; border: none; width: 100%; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 200; }
         .modal-content { position: relative; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px); padding: 30px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); width: 90%; max-width: 350px; color: white; box-sizing: border-box; }
         .back-arrow { position: absolute; top: 15px; left: 20px; font-size: 24px; cursor: pointer; font-weight: bold; }
@@ -59,6 +59,7 @@
 
 <div id="modal" class="modal"><div class="modal-content"><span class="back-arrow" onclick="closeModal()">&#8592;</span><div id="stepContent"></div></div></div>
 <div id="manageModal" class="modal"><div class="modal-content"><span class="back-arrow" onclick="closeManageModal()">&#8592;</span><div id="manageStepContent"></div></div></div>
+<div id="detailsModal" class="modal"><div class="modal-content"><span class="back-arrow" onclick="closeDetailsModal()">&#8592;</span><div id="detailsContent"></div></div></div>
 
 <script>
     let productTemp = {};
@@ -87,6 +88,7 @@
     document.getElementById('manageBtn').onclick = () => { document.getElementById('manageModal').style.display = 'flex'; showManageStep(1); };
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeManageModal() { document.getElementById('manageModal').style.display = 'none'; }
+    function closeDetailsModal() { document.getElementById('detailsModal').style.display = 'none'; }
 
     function showStep(step) {
         const s = document.getElementById('stepContent');
@@ -115,8 +117,29 @@
     }
 
     function renderMainProducts() {
-        document.getElementById('productList').innerHTML = productsArray.map(p => `<div class="product-card" data-category="${p.cat}" data-platform="${p.plat}" data-price="${p.offerPrice}"><img src="${p.img}"><h3>${p.name}</h3><p>${p.plat}</p><p><span class="old-price">₹${p.oldPrice}</span> <span class="offer-price">₹${p.offerPrice}</span></p><a href="${p.link}" target="_blank" class="btn">Buy Now</a></div>`).join('');
+        document.getElementById('productList').innerHTML = productsArray.map(p => 
+            `<div class="product-card" data-category="${p.cat}" data-platform="${p.plat}" data-price="${p.offerPrice}">
+                <img src="${p.img}">
+                <h3>${p.name}</h3>
+                <p>${p.plat}</p>
+                <p><span class="old-price">₹${p.oldPrice}</span> <span class="offer-price">₹${p.offerPrice}</span></p>
+                <button class="btn" onclick="showDetails(${p.id})">View Details</button>
+            </div>`
+        ).join('');
         filterProducts();
+    }
+
+    function showDetails(id) {
+        const p = productsArray.find(item => item.id === id);
+        const detailsDiv = document.getElementById('detailsContent');
+        detailsDiv.innerHTML = `
+            <img src="${p.img}" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+            <h3>${p.name}</h3>
+            <p>Platform: ${p.plat}</p>
+            <p>Price: <span class="offer-price">₹${p.offerPrice}</span> <span class="old-price">₹${p.oldPrice}</span></p>
+            <a href="${p.link}" target="_blank" class="btn">Go to ${p.plat}</a>
+        `;
+        document.getElementById('detailsModal').style.display = 'flex';
     }
 
     function filterProducts() {
